@@ -1,0 +1,149 @@
+
+services:
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    env_file: .env
+    ports:
+     - 5432:5432
+    environment:
+      - POSTGRES_USER=${POSTGRESQL_USER}
+      - POSTGRES_DB=${POSTGRESQL_DB}
+      - POSTGRES_PASSWORD=${POSTGRESQL_PASSWORD}
+    networks:
+      - iot_campus_uis
+  
+  emqx:
+    user: root
+    image: "emqx/emqx:5.8"
+    container_name: emqx
+    ports:
+      - "18083:18083"
+      - "1883:1883" 
+    volumes:
+      - ./data/emqx/data:/opt/emqx/data
+      - ./data/emqx/log:/opt/emqx/log
+    networks:
+      - iot_campus_uis
+  
+  influxdb:
+    image: "influxdb:2.7.11"
+    container_name: influxdb
+    ports: 
+      - "8086:8086"
+    volumes:
+      - ./data/influxdb/data:/var/lib/influxdb2
+      - ./data/influxdb/config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admindb
+      - DOCKER_INFLUXDB_INIT_PASSWORD=smartcampusuis
+      - DOCKER_INFLUXDB_INIT_ORG=uis
+      - DOCKER_INFLUXDB_INIT_BUCKET=iotuis
+      - DOCKER_INFLUXDB_INIT_RETENTION=1w
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=smartcampusuis-iot-auth-token
+    networks:
+      - iot_campus_uis
+  
+  telegraf:
+    image: "telegraf:1.33"
+    container_name: telegraf
+    volumes:
+      - ./data/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+    depends_on:
+      - emqx
+      - influxdb
+    restart: unless-stopped  
+    networks:
+      - iot_campus_uis
+  
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+     - 27017:27017
+    networks: 
+      - iot_campus_uis
+  
+  admin:
+    restart: always
+    depends_on:
+      - db
+    build: admin_microservice
+    #ports:
+    #  - 8081:8081
+    environment:
+      - POSTGRESQL_HOST=db
+      - POSTGRESQL_PORT=${POSTGRESQL_PORT}
+      - POSTGRESQL_DB=${POSTGRESQL_DB}
+      - POSTGRESQL_USER=${POSTGRESQL_USER}
+      - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+      - ADMIN_SERVICE_PORT=${ADMIN_SERVICE_PORT}
+    networks:
+      - iot_campus_uis
+  
+  data:
+    restart: always
+    env_file: .env
+    depends_on:
+      - mongo
+    build: data_microservice
+    ports:
+     - 8082:8082
+    environment:
+      - MONGO_HOST=mongo
+      - DATA_SERVICE_PORT=${DATA_SERVICE_PORT}
+      - BROKER_IP=${BROKER_IP}
+      - BROKER_CLIENT_ID=${BROKER_CLIENT_ID}
+      - BROKER_TOPIC=${BROKER_TOPIC}
+      - BROKER_USERNAME=${BROKER_USERNAME}
+      - BROKER_PASSWORD=${BROKER_PASSWORD}
+    networks:
+      - iot_campus_uis
+  
+  gateway:
+    restart: always
+    build: go_gateway
+    depends_on:
+      - admin
+    ports:
+      - 8080:8080
+    environment:
+      - ADMIN_HOST=http://admin:${ADMIN_SERVICE_PORT}
+      - DATA_HOST=http://data:${DATA_SERVICE_PORT}
+      - GATEWAY_PORT=${GATEWAY_PORT}
+    networks:
+      - iot_campus_uis
+
+  frontend:
+    restart: always
+    build: frontend_admin
+    depends_on:
+      - admin
+      - gateway
+      - data
+    ports:
+      - 4000:80
+    networks:
+      - iot_campus_uis
+  
+  grafana:
+    image: "grafana/grafana:11.5.0"
+    container_name: grafana
+    user: "$UID:$GID"
+    ports:
+      - "3000:3000"
+    volumes:
+      - '$PWD/data/grafana:/var/lib/grafana'
+    networks:
+      - iot_campus_uis
+    depends_on:
+      - influxdb
+
+networks: 
+  iot_campus_uis:
+    driver: bridge
+
+
+

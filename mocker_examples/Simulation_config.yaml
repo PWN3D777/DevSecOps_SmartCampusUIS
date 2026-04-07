@@ -1,0 +1,47 @@
+name: Smart Campus Template Message
+
+protocols:
+  - type: mqtt
+    host: emqx
+    port: 1883
+    topic: smartCampus/test
+    clientId: c03d5156
+    username: admin
+    password: public
+
+sampler:
+  type: loop
+  delay: 30000
+
+generators:
+
+  - type: timestamp
+    name: TimestampGenerator
+
+  - type: boolean
+    name: BooleanGenerator
+    probability: 0.5
+
+  - type: random_double
+    name: RandomDoubleTemperature
+    min: 18
+    max: 29
+    decimals: 3
+
+  - type: random_double
+    name: RandomDouble
+    min: 10
+    max: 100
+    decimals: 3
+
+  - type: string
+    name: StringWeightedGenerator
+    sampling: weighted
+    values:
+      - RUNNING
+      - IDLE
+      - STOPPED
+    weights:
+      - 0.8
+      - 0.1
+      - 0.1
