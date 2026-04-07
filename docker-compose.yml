@@ -131,7 +131,6 @@ services:
   grafana:
     image: "grafana/grafana:11.5.0"
     container_name: grafana
-    user: "$UID:$GID"
     ports:
       - "3000:3000"
     volumes:
