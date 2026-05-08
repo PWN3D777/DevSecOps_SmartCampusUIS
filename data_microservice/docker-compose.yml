@@ -3,7 +3,7 @@ services:
     image: influxdb:2.7
     restart: always
     env_file:
-      - .env.example
+      - .env
     ports:
       - 8086:8086
     environment:
@@ -23,7 +23,7 @@ services:
     image: mongo
     restart: always
     env_file:
-      - .env.example
+      - .env
     ports:
       - 27017:27017
     environment:
@@ -39,7 +39,7 @@ services:
     image: quay.io/minio/minio
     restart: always
     env_file:
-      - .env.example
+      - .env
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -56,7 +56,7 @@ services:
     image: rabbitmq:4.0-management
     restart: always
     env_file:
-      - .env.example
+      - .env
     ports:
       - 5672:5672
       - 15672:15672
@@ -86,7 +86,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     env_file:
-      - .env.example
+      - .env
     ports:
       - 8080:8080
     environment:
