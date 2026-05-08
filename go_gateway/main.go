@@ -19,8 +19,8 @@ func getVariable(key string, def string) string {
 
 func main() {
 
-	admin_service_route := getVariable("ADMIN_HOST", "http://localhost:8081")
-	data_service_route := getVariable("DATA_HOST", "http://localhost:8082")
+	admin_service_route := getVariable("ADMIN_HOST", "http://192.168.1.141:8081")
+	data_service_route := getVariable("DATA_HOST", "http://192.168.1.141:8082")
 	port := ":" + getVariable("GATEWAY_PORT", "8080")
 
 	http.HandleFunc("/admin/", proxy(admin_service_route, 6))
