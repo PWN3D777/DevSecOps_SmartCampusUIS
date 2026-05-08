@@ -78,20 +78,22 @@ public class CameraControllerTest {
 
     @Test
     public void listAllCamera(){
+    
+        when(cameraRepository.findAll()).thenReturn(camerasList);
+    
+        List<CameraDTO> CamerasDTOList = List.of(
+            new CameraDTO("Cam1", "url1", StateCamera.Stopped),
+            new CameraDTO("Cam2", "url2", StateCamera.Stopped),
+            new CameraDTO("Cam3", "url3", StateCamera.Stopped)
+        );
+    
         when(cameraMapper.mapCameraToCameraDTO(anyList()))
         .thenReturn(CamerasDTOList);
-
+    
         ResponseEntity<?> response = cameraController.listAllCamera();
-        List<CameraDTO> CamerasDTOList = List.of(
-        new CameraDTO("Cam1", "url1", StateCamera.Stopped),
-        new CameraDTO("Cam2", "url2", StateCamera.Stopped),
-        new CameraDTO("Cam3", "url3", StateCamera.Stopped)
-        );
-
-        when(cameraMapper.mapCameraToCameraDTO(camerasList))
-        .thenReturn(CamerasDTOList);
-
+    
         assertEquals(HttpStatus.OK, response.getStatusCode());
+    
         assertThat((List<CameraDTO>) response.getBody())
                 .usingRecursiveComparison()
                 .isEqualTo(CamerasDTOList);
