@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
+
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +47,7 @@ public class CameraControllerTest {
                 "http://example.com/camara", StateCamera.Stopped);
     }
 
-    @Disabled
+
     @Test
     public void addCamera() {
         when(cameraRepository.existsByName(camera.getName())).thenReturn(false);
@@ -67,7 +67,7 @@ public class CameraControllerTest {
         assertEquals(cameraSaveDTO, response.getBody());
     }
 
-    @Disabled
+
     @Test
     public void listAllCamera(){
         when(cameraRepository.findAll()).thenReturn(camerasList);
@@ -81,7 +81,7 @@ public class CameraControllerTest {
                 .isEqualTo(CamerasDTOList);
     }
 
-    @Disabled
+
     @Test
     public void deleteCamera(){
         when(cameraRepository.findById(camera.getId())).thenReturn(camera);
