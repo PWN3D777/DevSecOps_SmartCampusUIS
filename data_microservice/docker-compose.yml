@@ -3,11 +3,10 @@ services:
     image: influxdb:2.7
     restart: always
     env_file:
-      - .env
+      - .env.example
     ports:
       - 8086:8086
     environment:
-      - INFLUXDB_URL=http://influxdb:8086
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USER}
       - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
@@ -24,7 +23,7 @@ services:
     image: mongo
     restart: always
     env_file:
-      - .env
+      - .env.example
     ports:
       - 27017:27017
     environment:
@@ -40,7 +39,7 @@ services:
     image: quay.io/minio/minio
     restart: always
     env_file:
-      - .env
+      - .env.example
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -57,7 +56,7 @@ services:
     image: rabbitmq:4.0-management
     restart: always
     env_file:
-      - .env
+      - .env.example
     ports:
       - 5672:5672
       - 15672:15672
@@ -87,7 +86,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     env_file:
-      - .env
+      - .env.example
     ports:
       - 8080:8080
     environment:
