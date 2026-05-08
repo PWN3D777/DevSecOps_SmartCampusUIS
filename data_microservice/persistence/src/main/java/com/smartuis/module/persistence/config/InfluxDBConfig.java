@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class InfluxDBConfig {
 
-    @Value("${influxdb.url}")
+    @Value("${INFLUXDB_URL}")
     private String url;
 
     @Value("${influxdb.token}")
