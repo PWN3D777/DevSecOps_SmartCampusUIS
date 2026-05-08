@@ -1,4 +1,3 @@
-
 services:
   db:
     image: postgres
@@ -6,31 +5,31 @@ services:
     shm_size: 128mb
     env_file: .env
     ports:
-     - 5432:5432
+      - 5432:5432
     environment:
       - POSTGRES_USER=${POSTGRESQL_USER}
       - POSTGRES_DB=${POSTGRESQL_DB}
       - POSTGRES_PASSWORD=${POSTGRESQL_PASSWORD}
     networks:
       - iot_campus_uis
-  
+
   emqx:
     user: root
     image: "emqx/emqx:5.8"
     container_name: emqx
     ports:
       - "18083:18083"
-      - "1883:1883" 
+      - "1883:1883"
     volumes:
       - ./data/emqx/data:/opt/emqx/data
       - ./data/emqx/log:/opt/emqx/log
     networks:
       - iot_campus_uis
-  
+
   influxdb:
     image: "influxdb:2.7.11"
     container_name: influxdb
-    ports: 
+    ports:
       - "8086:8086"
     volumes:
       - ./data/influxdb/data:/var/lib/influxdb2
@@ -45,7 +44,7 @@ services:
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=smartcampusuis-iot-auth-token
     networks:
       - iot_campus_uis
-  
+
   telegraf:
     image: "telegraf:1.33"
     container_name: telegraf
@@ -54,18 +53,45 @@ services:
     depends_on:
       - emqx
       - influxdb
-    restart: unless-stopped  
+    restart: unless-stopped
     networks:
       - iot_campus_uis
-  
+
   mongo:
     image: mongo
     restart: always
     ports:
-     - 27017:27017
-    networks: 
+      - 27017:27017
+    networks:
       - iot_campus_uis
-  
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - iot_campus_uis
+
+  minio:
+    image: minio/minio:latest
+    command: server --console-address ":9001" /data
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./data/minio/data:/data
+    networks:
+      - iot_campus_uis
+
   admin:
     restart: always
     depends_on:
@@ -82,26 +108,44 @@ services:
       - ADMIN_SERVICE_PORT=${ADMIN_SERVICE_PORT}
     networks:
       - iot_campus_uis
-  
+
   data:
     restart: always
     env_file: .env
     depends_on:
       - mongo
+      - rabbitmq
+      - influxdb
+      - minio
+      - emqx
     build: data_microservice
     ports:
-     - 8082:8082
+      - 8082:8082
     environment:
-      - MONGO_HOST=mongo
       - DATA_SERVICE_PORT=${DATA_SERVICE_PORT}
-      - BROKER_IP=${BROKER_IP}
-      - BROKER_CLIENT_ID=${BROKER_CLIENT_ID}
-      - BROKER_TOPIC=${BROKER_TOPIC}
-      - BROKER_USERNAME=${BROKER_USERNAME}
-      - BROKER_PASSWORD=${BROKER_PASSWORD}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - TOPIC_LISTENER=${TOPIC_LISTENER}
+      - MQTT_BROKER_URL=${MQTT_BROKER_URL}
+      - MQTT_BROKER_CLIENT_ID=${MQTT_BROKER_CLIENT_ID}
+      - INFLUXDB_URL=${INFLUXDB_URL}
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
+      - INFLUXDB_ORG=${INFLUXDB_ORG}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - MONGO_AUTH_DB=${MONGO_AUTH_DB}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MINIO_URL=${MINIO_URL}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET=${MINIO_BUCKET}
     networks:
       - iot_campus_uis
-  
+
   gateway:
     restart: always
     build: go_gateway
@@ -127,7 +171,7 @@ services:
       - 4000:80
     networks:
       - iot_campus_uis
-  
+
   grafana:
     image: "grafana/grafana:11.5.0"
     container_name: grafana
@@ -141,9 +185,6 @@ services:
     depends_on:
       - influxdb
 
-networks: 
+networks:
   iot_campus_uis:
     driver: bridge
-
-
-
