@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -61,7 +62,10 @@ public class CameraControllerTest {
                 "http://example.com/camara", StateCamera.Stopped);;
 
         when(cameraRepository.save(any(Camera.class))).thenReturn(cameraSave);
-        CameraDTO cameraSaveDTO = cameraMapper.mapCameraToCameraDTO(cameraSave);
+        CameraDTO cameraSaveDTO = new CameraDTO();
+
+        when(cameraMapper.mapCameraToCameraDTO(any(Camera.class)))
+        .thenReturn(cameraSaveDTO);
         when(cameraMapper.mapCameraToCameraDTO(any(Camera.class))).thenReturn(cameraSaveDTO);
 
         ResponseEntity<?> response = cameraController.addCamera(camera);
@@ -76,7 +80,14 @@ public class CameraControllerTest {
         when(cameraRepository.findAll()).thenReturn(camerasList);
 
         ResponseEntity<?> response = cameraController.listAllCamera();
-        List<CameraDTO> CamerasDTOList = cameraMapper.mapCameraToCameraDTO(camerasList);
+        List<CameraDTO> CamerasDTOList = List.of(
+        new CameraDTO(),
+        new CameraDTO(),
+        new CameraDTO()
+        );
+
+        when(cameraMapper.mapCameraToCameraDTO(camerasList))
+        .thenReturn(CamerasDTOList);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertThat((List<CameraDTO>) response.getBody())
@@ -87,7 +98,8 @@ public class CameraControllerTest {
 
     @Test
     public void deleteCamera(){
-        when(cameraRepository.findById(camera.getId())).thenReturn(camera);
+        when(cameraRepository.findById(camera.getId()))
+        .thenReturn(Optional.of(camera));
         ResponseEntity<?> response = cameraController.deleteCamera(camera.getId());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
