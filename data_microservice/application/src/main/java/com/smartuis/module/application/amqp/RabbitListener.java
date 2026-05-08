@@ -16,7 +16,12 @@ public class RabbitListener {
         this.messageRepository = messageRepository;
     }
 
-    @org.springframework.amqp.rabbit.annotation.RabbitListener(queues = "#{anonQueue.name}")
+    @org.springframework.amqp.rabbit.annotation.RabbitListener(
+        queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(
+            value = "${rabbitmq.queue}",
+            durable = "true"
+        )
+    )
     public void receiveMessage(Message message){
         System.out.println(message.toString());
         messageRepository.forEach(repo->repo.write(message));
