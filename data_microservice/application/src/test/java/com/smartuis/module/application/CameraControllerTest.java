@@ -65,8 +65,7 @@ public class CameraControllerTest {
         when(cameraRepository.save(any(Camera.class))).thenReturn(cameraSave);
         CameraDTO cameraSaveDTO = new CameraDTO("CamaraTest","http://example.com/camara",StateCamera.Stopped);
 
-        when(cameraMapper.mapCameraToCameraDTO(any(Camera.class)))
-        .thenReturn(cameraSaveDTO);
+
         when(cameraMapper.mapCameraToCameraDTO(any(Camera.class))).thenReturn(cameraSaveDTO);
 
         ResponseEntity<?> response = cameraController.addCamera(camera);
