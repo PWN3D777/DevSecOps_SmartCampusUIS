@@ -62,7 +62,7 @@ public class CameraControllerTest {
                 "http://example.com/camara", StateCamera.Stopped);;
 
         when(cameraRepository.save(any(Camera.class))).thenReturn(cameraSave);
-        CameraDTO cameraSaveDTO = new CameraDTO();
+        CameraDTO cameraSaveDTO = new new CameraDTO("CamaraTest","http://example.com/camara",StateCamera.Stopped)
 
         when(cameraMapper.mapCameraToCameraDTO(any(Camera.class)))
         .thenReturn(cameraSaveDTO);
@@ -81,9 +81,9 @@ public class CameraControllerTest {
 
         ResponseEntity<?> response = cameraController.listAllCamera();
         List<CameraDTO> CamerasDTOList = List.of(
-        new CameraDTO(),
-        new CameraDTO(),
-        new CameraDTO()
+        new CameraDTO("Cam1", "url1", StateCamera.Stopped),
+        new CameraDTO("Cam2", "url2", StateCamera.Stopped),
+        new CameraDTO("Cam3", "url3", StateCamera.Stopped)
         );
 
         when(cameraMapper.mapCameraToCameraDTO(camerasList))
@@ -99,7 +99,7 @@ public class CameraControllerTest {
     @Test
     public void deleteCamera(){
         when(cameraRepository.findById(camera.getId()))
-        .thenReturn(Optional.of(camera));
+        .thenReturn(camera);
         ResponseEntity<?> response = cameraController.deleteCamera(camera.getId());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
