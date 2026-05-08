@@ -7,6 +7,7 @@ services:
     ports:
       - 8086:8086
     environment:
+      - INFLUXDB_URL=http://influxdb:8086
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USER}
       - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
