@@ -36,7 +36,7 @@ RUN mkdir -p /app/application
 COPY --from=builder /data_microservice/application/target/*.jar app.jar
 
 # Exponemos el puerto 8080, donde se ejecuta el microservicio
-EXPOSE 8080
+EXPOSE 8082
 
 # Arrancamos el microservicio
 ENTRYPOINT ["java", "-jar", "app.jar"]
