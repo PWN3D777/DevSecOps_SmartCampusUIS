@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
+import static org.mockito.ArgumentMatchers.anyList;
 
 import java.util.List;
 
@@ -77,7 +78,8 @@ public class CameraControllerTest {
 
     @Test
     public void listAllCamera(){
-        when(cameraRepository.findAll()).thenReturn(camerasList);
+        when(cameraMapper.mapCameraToCameraDTO(anyList()))
+        .thenReturn(CamerasDTOList);
 
         ResponseEntity<?> response = cameraController.listAllCamera();
         List<CameraDTO> CamerasDTOList = List.of(
