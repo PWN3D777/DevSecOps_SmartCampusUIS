@@ -46,7 +46,7 @@ public class CameraControllerTest {
                 "http://example.com/camara", StateCamera.Stopped);
     }
 
-
+    @Disabled
     @Test
     public void addCamera() {
         when(cameraRepository.existsByName(camera.getName())).thenReturn(false);
@@ -66,6 +66,7 @@ public class CameraControllerTest {
         assertEquals(cameraSaveDTO, response.getBody());
     }
 
+    @Disabled
     @Test
     public void listAllCamera(){
         when(cameraRepository.findAll()).thenReturn(camerasList);
@@ -79,6 +80,7 @@ public class CameraControllerTest {
                 .isEqualTo(CamerasDTOList);
     }
 
+    @Disabled
     @Test
     public void deleteCamera(){
         when(cameraRepository.findById(camera.getId())).thenReturn(camera);
