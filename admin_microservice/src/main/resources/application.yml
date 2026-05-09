@@ -8,7 +8,7 @@ spring:
       initialization-fail-timeout: -1  # <--- no fallar si DB no está lista
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${JPA_DDL_AUTO:none}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect   # ESTE ES EL FIX
