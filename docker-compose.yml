@@ -111,6 +111,7 @@ services:
       - POSTGRESQL_USER=${POSTGRESQL_USER}
       - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
       - ADMIN_SERVICE_PORT=${ADMIN_SERVICE_PORT}
+      - JPA_DDL_AUTO=update
     networks:
       - iot_campus_uis
 
