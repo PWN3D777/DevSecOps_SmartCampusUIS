@@ -193,7 +193,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./data/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
     depends_on:
       - emqx
       - influxdb
